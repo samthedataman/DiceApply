@@ -1,0 +1,7 @@
+streamlit
+selenium==4.9.1
+webdriver-manager==3.8.6
+requests==2.30.0
+beautifulsoup4==4.12.2
+altair==4.2.2
+undetected-chromedriver
