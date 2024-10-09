@@ -1,4 +1,6 @@
 import streamlit as st
+import pandas as pd
+import matplotlib.pyplot as plt
 import time
 import random
 import re
@@ -16,6 +18,7 @@ from selenium.common.exceptions import (
 from webdriver_manager.chrome import ChromeDriverManager
 import requests
 from bs4 import BeautifulSoup
+from datetime import datetime
 
 # Custom CSS for the Streamlit app
 custom_css = """
@@ -169,7 +172,6 @@ def get_links_bs(url):
 
 
 # Function to apply for jobs
-# Function to apply for jobs
 def apply_to_job(driver, link, email, password, max_attempts=3):
     for attempt in range(max_attempts):
         try:
@@ -247,7 +249,7 @@ def main():
         )
 
     with col2:
-        job_type = st.text_input("🧑‍💼 Enter Job Type:", key="job_type")
+        job_type = st.text_input("🧑‍🏢 Enter Job Type:", key="job_type")
         num_jobs = st.number_input(
             "🔢 Number of jobs to apply:",
             min_value=1,
@@ -261,7 +263,7 @@ def main():
             st.error("❌ Please fill in all fields.")
             return
 
-        st.write("🛠️ Initializing WebDriver...")
+        st.write("🔨 Initializing WebDriver...")
         driver = get_driver()
         if not driver:
             st.error(
@@ -279,19 +281,56 @@ def main():
         st.write("✉️ Applying to jobs...")
         successful_applications = 0
         failed_applications = 0
+        job_data = []
 
         for index, link in enumerate(job_links):
             st.write(f"💼 Applying to job {index + 1} of {len(job_links)}")
-            if apply_to_job(driver, link, email, password):
+            time_applied = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+            success = apply_to_job(driver, link, email, password)
+            if success:
                 successful_applications += 1
                 st.success(f"✅ Successfully applied to job: {link}")
+                job_data.append(
+                    {
+                        "Job Link": link,
+                        "Job Title": job_type,
+                        "Status": "Successful",
+                        "Time Applied": time_applied,
+                    }
+                )
             else:
                 failed_applications += 1
                 st.warning(f"❌ Failed to apply to job: {link}")
+                job_data.append(
+                    {
+                        "Job Link": link,
+                        "Job Title": job_type,
+                        "Status": "Failed",
+                        "Time Applied": time_applied,
+                    }
+                )
             time.sleep(2)
 
         driver.quit()
         st.success("🎉 Job application process completed!")
+
+        # Display cumulative bar chart of job applications
+        st.subheader("📈 Cumulative Job Application Summary")
+        fig, ax = plt.subplots()
+        ax.bar(
+            ["Successful Applications", "Failed Applications"],
+            [successful_applications, failed_applications],
+            color=["#4CAF50", "#F44336"],
+        )
+        ax.set_xlabel("Application Status")
+        ax.set_ylabel("Number of Applications")
+        ax.set_title("Cumulative Job Application Summary")
+        st.pyplot(fig)
+
+        # Display a dataframe of job links, titles, statuses, and time applied
+        st.subheader("📄 User Dashboard - Job Links and Application Status")
+        job_df = pd.DataFrame(job_data)
+        st.dataframe(job_df)
 
         st.markdown(
             f"""
@@ -305,14 +344,14 @@ def main():
             unsafe_allow_html=True,
         )
 
-        # Add a download button for the job links
-        if job_links:
-            job_links_text = "\n".join(job_links)
+        # Add a download button for the job links with additional information
+        if job_data:
+            job_df_csv = job_df.to_csv(index=False)
             st.download_button(
-                label="⬇️ Download Job Links",
-                data=job_links_text,
-                file_name="job_links.txt",
-                mime="text/plain",
+                label="📥 Download Job Application Data",
+                data=job_df_csv,
+                file_name="job_application_data.csv",
+                mime="text/csv",
             )
 
 
