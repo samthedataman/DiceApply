@@ -23,7 +23,52 @@ from datetime import datetime
 # Custom CSS for the Streamlit app
 custom_css = """
 <style>
-    /* Your CSS styles here */
+    body {
+        font-family: 'Segoe UI', sans-serif;
+        background: linear-gradient(135deg, #1e1e2e 0%, #2a2a3c 100%);
+        color: #e0e0e0;
+    }
+    .stApp {
+        max-width: 1200px;
+        margin: 0 auto;
+    }
+    .info-box {
+        background: linear-gradient(45deg, #44475a 0%, #6272a4 100%);
+        border-radius: 10px;
+        padding: 20px;
+        margin-bottom: 20px;
+        box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    }
+    .stButton > button {
+        background: linear-gradient(90deg, #bd93f9 0%, #ff79c6 100%);
+        color: #1e1e2e;
+        border: none;
+        padding: 10px 20px;
+        font-weight: bold;
+        border-radius: 25px;
+        transition: all 0.3s ease;
+        box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    }
+    .stButton > button:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 8px rgba(0,0,0,0.15);
+    }
+    .stTextInput > div > div > input, .stSelectbox > div > div > select, .stNumberInput > div > div > input {
+        background-color: #383a59;
+        color: #f8f8f2;
+        border: 1px solid #6272a4;
+        border-radius: 5px;
+    }
+    .stProgress > div > div > div {
+        background-color: #ff79c6;
+    }
+    .stAlert {
+        background-color: #44475a;
+        color: #f8f8f2;
+        border-radius: 5px;
+        padding: 10px;
+        margin-bottom: 10px;
+    }
 </style>
 """
 
@@ -180,7 +225,7 @@ def apply_to_job(driver, link, email, password, max_attempts=3):
             time.sleep(random.uniform(2, 4))
 
             # Find and click the apply button using existing logic
-            time.sleep(2)  # Adding a delay to ensure the page is loaded
+            time.sleep(5)  # Adding a delay to ensure the page is loaded
             shadow_host = driver.find_element(By.TAG_NAME, "apply-button-wc")
             shadow_root = driver.execute_script(
                 "return arguments[0].shadowRoot", shadow_host

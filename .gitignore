@@ -1,3 +1,6 @@
 venv/
+build/
+.streamlit/
 env/
 .venv/
+../../.DS_Store
